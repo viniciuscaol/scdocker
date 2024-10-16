@@ -1,0 +1,25 @@
+# Usar a imagem oficial do WordPress como base
+FROM wordpress:latest
+
+# Definir variáveis de ambiente para evitar prompts durante a instalação
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Instalar o MySQL Server
+RUN apt-get update && apt-get install -y \
+    mysql-server \
+    && rm -rf /var/lib/apt/lists/*
+
+# Criar o diretório do MySQL e ajustar permissões
+RUN mkdir -p /var/run/mysqld /var/lib/mysql \
+    && chown -R mysql:mysql /var/run/mysqld \
+    && chown -R mysql:mysql /var/lib/mysql
+
+# Copiar o script de inicialização
+COPY init.sh /init.sh
+RUN chmod +x /init.sh
+
+# Expor a porta 8080 para o WordPress
+EXPOSE 8080
+
+# Comando padrão para rodar o script de inicialização
+CMD ["/init.sh"]
