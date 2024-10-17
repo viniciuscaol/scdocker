@@ -1,0 +1,43 @@
+version: '3.8'
+services:
+  back:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    container_name: back
+    volumes:
+      - ./back:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database-mongo
+    networks:
+      - app-network
+
+  database-mongo:
+      build:
+        context: ./db
+        dockerfile: Dockerfile
+      container_name: database-mongo
+      ports:
+        - "27017:27017"
+      networks:
+        - app-network
+  
+  front:
+      build:
+        context: ./front
+        dockerfile: Dockerfile
+      container_name: front
+      volumes:
+        - ./front:/usr/share/nginx/html/
+      ports:
+        - "8080:80"
+      depends_on:
+        - back
+      networks:
+        - app-network
+
+networks:
+  app-network:
+    driver: bridge
